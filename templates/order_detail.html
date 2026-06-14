@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% set percent = ((order.current_amount / order.target_amount) * 100) if order.target_amount else 0 %}
+
+{% if percent > 100 %}
+    {% set percent = 100 %}
+{% endif %}
+
+<section class="detail-card">
+    <div class="order-head">
+        <span class="status {{ order.status }}">
+            {{ "모집중" if order.status == "open" else "마감" }}
+        </span>
+
+        <span class="small">{{ order.created_at }}</span>
+    </div>
+
+    <h2>{{ order.store_name }}</h2>
+
+    <p class="muted">{{ order.menu_summary }}</p>
+
+    <div class="progress-wrap">
+        <div class="progress-info">
+            <span>현재 {{ "{:,}".format(order.current_amount) }}원</span>
+            <span>목표 {{ "{:,}".format(order.target_amount) }}원</span>
+        </div>
+
+        <div class="progress-bar big">
+            <div class="progress-fill" data-percent="{{ percent }}"></div>
+        </div>
+    </div>
+
+    <div class="detail-grid">
+        <p>
+            <b>모집자</b><br>
+            {{ order.writer_name }} ·
+            {{ order.dong }}동 {{ order.ho }}호 ·
+            매너 {{ "%.1f"|format(order.manner_score) }}℃
+        </p>
+
+        <p>
+            <b>픽업 장소</b><br>
+            {{ order.pickup_place }}
+        </p>
+
+        <p>
+            <b>픽업 시간</b><br>
+            {{ order.pickup_time }}
+        </p>
+    </div>
+
+    {% if order.memo %}
+        <div class="memo">
+            {{ order.memo }}
+        </div>
+    {% endif %}
+
+    {% if order.user_id == session["user_id"] or session.get("is_admin") %}
+        {% if order.status == "open" %}
+            <form method="post" action="{{ url_for('close_order', order_id=order.id) }}">
+                <button class="btn danger" type="submit">모집 마감</button>
+            </form>
+        {% endif %}
+    {% endif %}
+</section>
+
+{% if order.status == "open" %}
+<section class="form-card wide">
+    <h3>공동 주문 참여</h3>
+
+    <form method="post" action="{{ url_for('join_order', order_id=order.id) }}">
+        <label>내가 주문할 메뉴</label>
+        <input name="item_name" placeholder="예: 참치김밥 1줄" required>
+
+        <label>주문 금액</label>
+        <input name="amount" type="number" min="1000" step="500" required>
+
+        <button class="btn primary full" type="submit">참여하기</button>
+    </form>
+</section>
+{% endif %}
+
+<section class="detail-card">
+    <h3>참여자 현황</h3>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>이름</th>
+                    <th>동/호수</th>
+                    <th>메뉴</th>
+                    <th>금액</th>
+                    <th>매너 온도</th>
+                    <th>신고</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for p in participants %}
+                    <tr>
+                        <td>{{ p.name }}</td>
+                        <td>{{ p.dong }}동 {{ p.ho }}호</td>
+                        <td>{{ p.item_name }}</td>
+                        <td>{{ "{:,}".format(p.amount) }}원</td>
+                        <td>{{ "%.1f"|format(p.manner_score) }}℃</td>
+
+                        <td>
+                            {% if p.user_id != session["user_id"] %}
+                                <details>
+                                    <summary>신고</summary>
+
+                                    <form method="post" action="{{ url_for('report_user', order_id=order.id, target_user_id=p.user_id) }}">
+                                        <input name="reason" placeholder="신고 사유" required>
+                                        <button class="btn small-btn danger" type="submit">접수</button>
+                                    </form>
+                                </details>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="6">아직 참여자가 없습니다.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="detail-card">
+    <h3>실시간 댓글</h3>
+
+    <div class="comment-list">
+        {% for c in comments %}
+            <div class="comment">
+                <b>{{ c.name }}</b>
+                <span class="small">{{ c.created_at }}</span>
+                <p>{{ c.message }}</p>
+            </div>
+        {% else %}
+            <p class="muted">아직 댓글이 없습니다.</p>
+        {% endfor %}
+    </div>
+
+    <form class="comment-form" method="post" action="{{ url_for('add_comment', order_id=order.id) }}">
+        <input name="message" placeholder="픽업 장소, 시간, 입금 관련 내용을 남기세요." required>
+        <button class="btn primary" type="submit">등록</button>
+    </form>
+</section>
+
+{% endblock %}

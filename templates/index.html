@@ -1,161 +1,57 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>아파트 배달 메이트</title>
-    <style>
-        /* 기본 레이아웃 */
-        body { 
-            font-family: 'Pretendard', -apple-system, sans-serif; 
-            max-width: 600px; 
-            margin: 0 auto; 
-            padding: 20px; 
-            background-color: #f8f9fa; 
-            color: #2d3436;
-        }
+{% extends "base.html" %}
 
-        /* 헤더 섹션 */
-        .header { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            margin-bottom: 25px;
-            padding: 15px;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-        .user-tag { font-weight: bold; color: #2d3436; }
-        .admin-link { 
-            font-size: 0.8em; 
-            color: #0984e3; 
-            text-decoration: none; 
-            margin-left: 10px;
-            padding: 2px 8px;
-            border: 1px solid #0984e3;
-            border-radius: 4px;
-        }
-        .logout-btn { color: #ff4757; text-decoration: none; font-size: 0.85em; }
+{% block content %}
 
-        /* 모집 폼 섹션 */
-        .create-card { 
-            background: #ffffff; 
-            padding: 20px; 
-            border-radius: 15px; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08); 
-            margin-bottom: 30px;
-        }
-        .create-card h3 { margin-top: 0; font-size: 1.1em; color: #2f3542; }
-        input { 
-            width: 100%; 
-            padding: 12px; 
-            margin-bottom: 10px; 
-            border: 1px solid #ddd; 
-            border-radius: 8px; 
-            box-sizing: border-box;
-            font-size: 14px;
-        }
+<section class="hero">
+    <div>
+        <p class="badge">Apartment Delivery Community</p>
 
-        /* 주문 목록 카드 */
-        .order-card { 
-            background: white; 
-            padding: 20px; 
-            margin-bottom: 15px; 
-            border-radius: 12px; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
-            border-top: 4px solid #ff4757;
-        }
-        .restaurant-name { font-size: 1.2em; font-weight: bold; margin-bottom: 5px; }
-        .leader-info { font-size: 0.85em; color: #747d8c; margin-bottom: 15px; }
-        
-        /* 프로그레스 바 스타일 */
-        .progress-box { margin: 15px 0; }
-        .progress-text { 
-            display: flex; 
-            justify-content: space-between; 
-            font-size: 0.85em; 
-            margin-bottom: 5px; 
-        }
-        .progress-bar { 
-            background: #eee; 
-            border-radius: 10px; 
-            height: 10px; 
-            overflow: hidden; 
-        }
-        .progress-fill { 
-            background: linear-gradient(90deg, #ff4757, #ff6b81); 
-            height: 100%; 
-            transition: width 0.3s ease-in-out;
-        }
+        <h1>
+            배달비는 줄이고,<br>
+            이웃 간 소통은 늘리는<br>
+            주민 전용 플랫폼
+        </h1>
 
-        /* 버튼 스타일 */
-        .btn { 
-            width: 100%; 
-            padding: 13px; 
-            border: none; 
-            border-radius: 8px; 
-            font-weight: bold; 
-            cursor: pointer; 
-            font-size: 15px;
-        }
-        .btn-black { background: #2f3542; color: white; }
-        .btn-green { background: #2ed573; color: white; margin-top: 10px; }
-        
-        .empty-state { text-align: center; color: #a4b0be; padding: 50px 0; }
-    </style>
-</head>
-<body>
+        <p class="hero-text">
+            같은 아파트 주민끼리 공동 주문을 모집하고,
+            참여 현황을 실시간으로 확인하며,
+            댓글로 픽업 장소와 시간을 조율할 수 있습니다.
+        </p>
 
-    <!-- 상단 헤더 -->
-    <div class="header">
-        <div class="user-info">
-            <span class="user-tag">🏠 {{ user }}</span>
-            {% if is_admin %}
-            <a href="/admin" class="admin-link">관리자 패널</a>
-            {% endif %}
+        <div class="hero-actions">
+            <a class="btn primary" href="{{ url_for('register') }}">주민 가입하기</a>
+            <a class="btn" href="{{ url_for('login') }}">로그인</a>
         </div>
-        <a href="/logout" class="logout-btn">로그아웃</a>
     </div>
 
-    <!-- 모집 게시글 작성 -->
-    <div class="create-card">
-        <h3>🍕 배달 메이트 찾기</h3>
-        <form action="/create" method="POST">
-            <input type="text" name="restaurant" placeholder="어떤 음식을 시키실 건가요?" required>
-            <input type="number" name="min_amount" placeholder="목표 최소 주문 금액 (원)" required>
-            <button type="submit" class="btn btn-black">모집 게시하기</button>
-        </form>
+    <div class="hero-card">
+        <h3>핵심 기능</h3>
+
+        <ul>
+            <li>관리자 승인 후 이용</li>
+            <li>공동 주문 모집</li>
+            <li>참여 금액 Progress Bar</li>
+            <li>댓글 기반 실시간 소통</li>
+            <li>매너 온도 신뢰 시스템</li>
+        </ul>
+    </div>
+</section>
+
+<section class="grid-3">
+    <div class="info-card">
+        <h3>🔐 보안</h3>
+        <p>관리자가 거주 사실을 확인한 주민만 서비스를 이용할 수 있습니다.</p>
     </div>
 
-    <h2>현재 대기 중인 주문</h2>
-
-    {% if not orders %}
-    <div class="empty-state">
-        <p>현재 모집 중인 주문이 없어요.<br>직접 첫 주문을 시작해보세요!</p>
+    <div class="info-card">
+        <h3>🛒 공동 구매</h3>
+        <p>목표 금액과 참여 금액을 확인하며 배달비 부담을 줄입니다.</p>
     </div>
-    {% endif %}
 
-    <!-- 주문 목록 반복 출력 -->
-    {% for order in orders %}
-    <div class="order-card">
-        <div class="restaurant-name">{{ order.restaurant }}</div>
-        <div class="leader-info">👑 모집장: {{ order.leader }}</div>
-        
-        <div class="progress-box">
-            <div class="progress-text">
-                <span>현재 {{ "{:,}".format(order.current_amount) }}원</span>
-                <span>목표 {{ "{:,}".format(order.min_amount) }}원</span>
-            </div>
-            <div class="progress-bar">
-                {% set percent = (order.current_amount / order.min_amount * 100) if order.min_amount > 0 else 0 %}
-                <div class="progress-fill" style="width: {{ percent if percent <= 100 else 100 }}%;"></div>
-            </div>
-        </div>
-
-        <button class="btn btn-green">참여하기</button>
+    <div class="info-card">
+        <h3>💬 소통</h3>
+        <p>주문별 댓글로 픽업 장소, 시간, 메뉴를 조율합니다.</p>
     </div>
-    {% endfor %}
+</section>
 
-</body>
-</html>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="form-card wide">
+    <h2>공동 주문 모집 등록</h2>
+
+    <form method="post">
+        <label>가게 이름</label>
+        <input name="store_name" placeholder="예: 김밥천국" required>
+
+        <label>대표 메뉴 / 주문 설명</label>
+        <input name="menu_summary" placeholder="예: 김밥, 라면, 돈가스 같이 주문" required>
+
+        <label>목표 주문 금액</label>
+        <input name="target_amount" type="number" min="1000" step="1000" placeholder="예: 30000" required>
+
+        <label>공동 픽업 장소</label>
+        <input name="pickup_place" placeholder="예: 101동 1층 로비" required>
+
+        <label>픽업 예정 시간</label>
+        <input name="pickup_time" placeholder="예: 오늘 저녁 7시 20분" required>
+
+        <label>추가 메모</label>
+        <textarea name="memo" rows="4" placeholder="입금 방식, 주문 마감 시간 등을 적으세요."></textarea>
+
+        <button class="btn primary full" type="submit">모집 글 등록</button>
+    </form>
+</div>
+
+{% endblock %}

@@ -1,42 +1,103 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <title>관리자 패널</title>
-    <style>
-        body { font-family: sans-serif; padding: 20px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
-        th { background-color: #f2f2f2; }
-        .status-pending { color: #e67e22; font-weight: bold; }
-        .status-approved { color: #27ae60; }
-        .btn-approve { background: #3498db; color: white; padding: 5px 10px; text-decoration: none; border-radius: 4px; }
-    </style>
-</head>
-<body>
-    <h1>🏢 주민 승인 관리</h1>
-    <a href="/">메인으로 돌아가기</a>
-    <table>
-        <tr>
-            <th>사용자 ID (동-호)</th>
-            <th>현재 상태</th>
-            <th>작업</th>
-        </tr>
-        {% for user_id, info in users.items() %}
-        {% if user_id != 'admin' %}
-        <tr>
-            <td>{{ user_id }}</td>
-            <td class="status-{{ info.status }}">{{ info.status }}</td>
-            <td>
-                {% if info.status == 'pending' %}
-                <a href="/approve/{{ user_id }}" class="btn-approve">승인하기</a>
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>관리자 통합 패널</h2>
+<p class="muted">주민 승인, 거절, 정지 처리를 할 수 있습니다.</p>
+
+<section class="detail-card">
+    <h3>주민 관리</h3>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>아이디</th>
+                    <th>이름</th>
+                    <th>동/호수</th>
+                    <th>상태</th>
+                    <th>매너</th>
+                    <th>처리</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for u in users %}
+                    <tr>
+                        <td>{{ u.id }}</td>
+                        <td>{{ u.username }}</td>
+                        <td>{{ u.name }}</td>
+                        <td>{{ u.dong }}동 {{ u.ho }}호</td>
+
+                        <td>
+                            {% if u.is_admin %}
+                                관리자
+                            {% elif u.is_approved == 1 %}
+                                승인
+                            {% elif u.is_approved == 0 %}
+                                대기/거절
+                            {% else %}
+                                정지
+                            {% endif %}
+                        </td>
+
+                        <td>{{ "%.1f"|format(u.manner_score) }}℃</td>
+
+                        <td class="actions">
+                            {% if not u.is_admin %}
+                                <form method="post" action="{{ url_for('admin_user_action', user_id=u.id, action='approve') }}">
+                                    <button class="btn small-btn primary" type="submit">승인</button>
+                                </form>
+
+                                <form method="post" action="{{ url_for('admin_user_action', user_id=u.id, action='reject') }}">
+                                    <button class="btn small-btn" type="submit">거절</button>
+                                </form>
+
+                                <form method="post" action="{{ url_for('admin_user_action', user_id=u.id, action='suspend') }}">
+                                    <button class="btn small-btn danger" type="submit">정지</button>
+                                </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="detail-card">
+    <h3>신고 내역</h3>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>신고자</th>
+                    <th>대상자</th>
+                    <th>주문 번호</th>
+                    <th>사유</th>
+                    <th>시간</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for r in reports %}
+                    <tr>
+                        <td>{{ r.reporter_name }}</td>
+                        <td>{{ r.target_name }}</td>
+                        <td>{{ r.order_id }}</td>
+                        <td>{{ r.reason }}</td>
+                        <td>{{ r.created_at }}</td>
+                    </tr>
                 {% else %}
-                -
-                {% endif %}
-            </td>
-        </tr>
-        {% endif %}
-        {% endfor %}
-    </table>
-</body>
-</html>
+                    <tr>
+                        <td colspan="5">신고 내역이 없습니다.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+{% endblock %}

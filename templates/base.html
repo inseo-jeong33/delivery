@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>엔분의동 (N분의洞)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<header class="topbar">
+    <a class="logo" href="{{ url_for('index') }}">📋 배달 메이트</a>
+
+    <nav>
+        {% if me %}
+            <a href="{{ url_for('dashboard') }}">주문 목록</a>
+            <a href="{{ url_for('new_order') }}">모집 등록</a>
+
+            {% if session.get("is_admin") %}
+                <a href="{{ url_for('admin') }}">관리자</a>
+            {% endif %}
+
+            <a href="{{ url_for('logout') }}">로그아웃</a>
+        {% else %}
+            <a href="{{ url_for('login') }}">로그인</a>
+            <a href="{{ url_for('register') }}">회원가입</a>
+        {% endif %}
+    </nav>
+</header>
+
+<main class="container">
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="flash-box">
+                {% for message in messages %}
+                    <p>{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+</main>
+
+<footer class="footer">
+    아파트 주민 전용 공동 배달 주문 플랫폼
+</footer>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

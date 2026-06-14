@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-title">
+    <div>
+        <h2>공동 주문 모집 목록</h2>
+        <p class="muted">현재 진행 중인 배달 공동 주문을 확인하세요.</p>
+    </div>
+
+    <a class="btn primary" href="{{ url_for('new_order') }}">+ 모집 등록</a>
+</div>
+
+<div class="order-grid">
+    {% for order in orders %}
+
+        {% set percent = ((order.current_amount / order.target_amount) * 100) if order.target_amount else 0 %}
+
+        {% if percent > 100 %}
+            {% set percent = 100 %}
+        {% endif %}
+
+        <article class="order-card">
+            <div class="order-head">
+                <span class="status {{ order.status }}">
+                    {{ "모집중" if order.status == "open" else "마감" }}
+                </span>
+
+                <span class="small">{{ order.created_at }}</span>
+            </div>
+
+            <h3>{{ order.store_name }}</h3>
+
+            <p class="muted">{{ order.menu_summary }}</p>
+
+            <div class="progress-wrap">
+                <div class="progress-info">
+                    <span>{{ "{:,}".format(order.current_amount) }}원</span>
+                    <span>목표 {{ "{:,}".format(order.target_amount) }}원</span>
+                </div>
+
+                <div class="progress-bar">
+                    <div class="progress-fill" data-percent="{{ percent }}"></div>
+                </div>
+            </div>
+
+            <p class="small">
+                참여 {{ order.participant_count }}명 ·
+                픽업 {{ order.pickup_place }} ·
+                {{ order.pickup_time }}
+            </p>
+
+            <p class="small">모집자: {{ order.writer_name }}</p>
+
+            <a class="btn full" href="{{ url_for('order_detail', order_id=order.id) }}">
+                자세히 보기
+            </a>
+        </article>
+
+    {% else %}
+
+        <div class="empty">
+            아직 등록된 공동 주문이 없습니다.
+        </div>
+
+    {% endfor %}
+</div>
+
+{% endblock %}
